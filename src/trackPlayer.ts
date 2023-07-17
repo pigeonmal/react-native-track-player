@@ -390,6 +390,13 @@ export async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
   return TrackPlayer.setRepeatMode(mode);
 }
 
+/**
+ * Sets the random mode.
+ */
+export async function setRandomMode(mode: Boolean): Promise<Boolean> {
+  return TrackPlayer.setRandomMode(mode);
+}
+
 // MARK: - Getters
 
 /**
@@ -507,6 +514,14 @@ export async function getPlaybackState(): Promise<PlaybackState> {
 export async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode();
 }
+
+/**
+ * Gets the random mode.
+ */
+export async function getRandomMode(): Promise<Boolean> {
+  return TrackPlayer.getRandomMode();
+}
+
 
 /**
  * Retries the current item when the playback state is `State.Error`.
