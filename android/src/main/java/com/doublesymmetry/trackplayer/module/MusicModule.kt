@@ -539,7 +539,20 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         callback.resolve(musicService.playWhenReady)
     }
+    @ReactMethod
+    fun setRandomMode(mode: Boolean, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
 
+        musicService.setRandomMode(mode)
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun getRandomMode(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        callback.resolve(musicService.getRandomMode())
+    }
     @ReactMethod
     fun getTrack(index: Int, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
