@@ -438,11 +438,6 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun updateNotificationMetadata(title: String?, artist: String?, artwork: String?) {
-        player.notificationManager.notificationMetadata = NotificationMetadata(title, artist, artwork)
-    }
-
-    @MainThread
     fun clearNotificationMetadata() {
         player.notificationManager.hideNotification()
     }
@@ -609,14 +604,13 @@ class MusicService : HeadlessJsTaskService() {
 
         scope.launch {
             event.audioItemTransition.collect {
-                var lastIndex: Int? = null
-                if (it is AudioItemTransitionReason.REPEAT) {
-                    lastIndex = player.currentIndex
-                } else if (player.previousItem != null) {
-                    lastIndex = player.previousIndex
+                if (it !is AudioItemTransitionReason.REPEAT) {
+                    emitPlaybackTrackChangedEvents(
+                        player.currentIndex,
+                        player.previousIndex,
+                        (it?.oldPosition ?: 0).toSeconds()
+                    )
                 }
-                var lastPosition = (it?.oldPosition ?: 0).toSeconds();
-                emitPlaybackTrackChangedEvents(player.currentIndex, lastIndex, lastPosition)
             }
         }
 
@@ -700,8 +694,8 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     private fun getPlaybackErrorBundle(): Bundle {
-        var bundle = Bundle()
-        var error = playbackError
+        val bundle = Bundle()
+        val error = playbackError
         if (error?.message != null) {
             bundle.putString("message", error.message)
         }
