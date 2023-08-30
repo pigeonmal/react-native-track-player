@@ -377,6 +377,16 @@ export async function setQueue(tracks: Track[]): Promise<void> {
 }
 
 /**
+ * Sets the queue but un interrupted.
+ *
+ * @param tracks The tracks to set as the queue un interrupted
+ * @see https://rntp.dev/docs/api/constants/repeat-mode
+ */
+export async function setQueueUninterrupted(tracks: Track[]): Promise<void> {
+  return TrackPlayer.setQueueUninterrupted(tracks);
+}
+
+/**
  * Sets the queue repeat mode.
  *
  * @param repeatMode The repeat mode to set.
