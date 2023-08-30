@@ -389,8 +389,8 @@ export async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
 /**
  * @param shuffle Shuffle or unshuffle playlist
  */
-export async function shuffle(shuffle: boolean): Promise<void> {
-  TrackPlayer.shuffle(shuffle);
+export async function shuffle(mode: boolean): Promise<void> {
+  TrackPlayer.shuffle(mode);
 }
 
 
