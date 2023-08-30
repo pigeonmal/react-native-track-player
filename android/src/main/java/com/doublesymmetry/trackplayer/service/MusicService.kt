@@ -59,7 +59,7 @@ class MusicService : HeadlessJsTaskService() {
 
     private var appKilledPlaybackBehavior = AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
 
-    var randomSeed: List<Int> = null;
+    var randomSeed: List<Int> = [];
 
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
@@ -400,7 +400,7 @@ class MusicService : HeadlessJsTaskService() {
     }
 
     @MainThread
-    fun isShuffle(): Boolean = randomSeed != null;
+    fun isShuffle(): Boolean = !randomSeed.isEmpty();
 
     @MainThread
     fun getVolume(): Float = player.volume
