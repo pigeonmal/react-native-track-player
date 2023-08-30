@@ -533,6 +533,43 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         musicService.playWhenReady = playWhenReady
         callback.resolve(null)
     }
+    private fun shuffleList(inArr: List<Track>, seed: List<Int>, unshuffle: Boolean = false): MutableList<Track> {
+        val outArr = inArr.toMutableList()
+        val len = inArr.size
+        val swap = { a: Int, b: Int -> outArr[a] = outArr[b].also { outArr[b] = outArr[a] } }
+        var i = if (unshuffle) len - 1 else 0
+        while ((unshuffle && i >= 0) || (!unshuffle && i < len)) {
+            swap(seed[i % seed.size] % len, i)
+            i += if (unshuffle) -1 else 1
+        }
+        return outArr;
+    }
+
+
+    @ReactMethod
+    fun shuffle(mode: Boolean, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+        const isShuffleActive = musicService.isShuffle();
+        if(mode == isShuffleActive || musicService.tracks.isEmpty()) {
+            callback.resolve(null);
+            return@launch
+        }
+     
+        val randomSeed = if (isShuffleActive) musicService.randomSeed else List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() }
+        val shuffledQueue = shuffleList(musicService.tracks, randomSeed, isShuffleActive)
+
+        musicService.randomSeed = if (isShuffleActive) null else randomSeed
+
+        setQueueUninterruptedList(shuffledQueue, callback)
+    }
+
+     @ReactMethod
+    fun isShuffle(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        callback.resolve(musicService.isShuffle())
+    }
+
 
     @ReactMethod
     fun getPlayWhenReady(callback: Promise) = scope.launch {
@@ -540,20 +577,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
 
         callback.resolve(musicService.playWhenReady)
     }
-    @ReactMethod
-    fun setRandomMode(mode: Boolean, callback: Promise) = scope.launch {
-        if (verifyServiceBoundOrReject(callback)) return@launch
+  
 
-        musicService.setRandomMode(mode)
-        callback.resolve(null)
-    }
-
-    @ReactMethod
-    fun getRandomMode(callback: Promise) = scope.launch {
-        if (verifyServiceBoundOrReject(callback)) return@launch
-
-        callback.resolve(musicService.getRandomMode())
-    }
     @ReactMethod
     fun getTrack(index: Int, callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
@@ -584,7 +609,44 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             rejectWithException(callback, exception)
         }
     }
+    
+    fun setQueueUninterruptedList(data: List<Track>, callback: Promise) {
+        val currentTrackIndex = musicService.getCurrentTrackIndex()
+        val originalQueue = musicService.tracks
+        val currentTrackId = Arguments.fromBundle(
+                originalQueue[currentTrackIndex].originalItem
+            ).id
+        
+        val currentTrackNewIndex = Arguments.fromList(data.map { it.originalItem }).indexOfFirst({it.id == currentTrackId})
 
+        if (currentTrackNewIndex < 0) {
+            musicService.clear()
+            musicService.add(data)
+        } else {
+            val removeTrackIndices = (0 until originalQueue.size).toMutableList()
+            removeTrackIndices.removeAt(currentTrackIndex)
+            musicService.remove(removeTrackIndices)
+            
+            val splicedTracks = data.takeLast(data.size - (currentTrackNewIndex+1)).plus(data.take(currentTrackNewIndex))
+            musicService.add(splicedTracks)
+        }
+
+
+        callback.resolve(null)
+    }
+
+    @ReactMethod
+    fun setQueueUninterrupted(data: ReadableArray?, callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+
+        try {
+            if (musicService.tracks.isEmpty())
+                setQueue(data, callback) 
+            else setQueueUninterruptedList(readableArrayToTrackList(data), callback)
+        } catch (exception: Exception) {
+            rejectWithException(callback, exception)
+        }
+    }
     @ReactMethod
     fun getActiveTrackIndex(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
