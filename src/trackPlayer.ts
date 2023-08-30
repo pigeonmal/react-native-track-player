@@ -389,11 +389,19 @@ export async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
 /**
  * @param shuffle Shuffle or unshuffle playlist
  */
-export async function shuffle(shuffle: Boolean): Promise<void> {
+export async function shuffle(shuffle: boolean): Promise<void> {
   TrackPlayer.shuffle(shuffle);
 }
 
+
 // MARK: - Getters
+
+/**
+ * Get if is shuffled playlist
+ */
+export async function isShuffle(): Promise<boolean> {
+  return TrackPlayer.isShuffle();
+}
 
 /**
  * Gets the volume of the player as a number between 0 and 1.
