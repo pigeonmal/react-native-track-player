@@ -555,12 +555,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             return@launch
         }
      
-        val randomSeed = if (isShuffleActive) musicService.randomSeed else List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() }
-        val shuffledQueue = shuffleList(musicService.tracks, randomSeed, isShuffleActive)
+        // TRUE: null, FALSE: ACTUAL SEED
+        val randomSeed = musicService.randomSeed
+        // TRUE: randomSeed, FALSE: null
+        musicService.randomSeed = if (isShuffleActive) null else List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() }
 
-        musicService.randomSeed = if (isShuffleActive) null else randomSeed
-
-        setQueueUninterruptedList(shuffledQueue, callback)
+        setQueueUninterruptedList(shuffledQueue, randomSeed, callback)
     }
 
      @ReactMethod
@@ -610,24 +610,27 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         }
     }
     
-    fun setQueueUninterruptedList(data: List<Track>, callback: Promise) {
+    fun setQueueUninterruptedList(data: List<Track>, randomSeed: List<Int>, callback: Promise) {
+        val isShuffleActive = musicService.isShuffle()
+        val tracksData = if (isShuffleActive) shuffleList(data, musicService.randomSeed) else if(randomSeed != null) shuffleList(data, randomSeed, true) else data
+
         val currentTrackIndex = musicService.getCurrentTrackIndex()
         val originalQueue = musicService.tracks
         val currentTrackId = Arguments.fromBundle(
                 originalQueue[currentTrackIndex].originalItem
             ).id
         
-        val currentTrackNewIndex = Arguments.fromList(data.map { it.originalItem }).indexOfFirst({it.id == currentTrackId})
+        val currentTrackNewIndex = Arguments.fromList(tracksData.map { it.originalItem }).indexOfFirst({it.id == currentTrackId})
 
         if (currentTrackNewIndex < 0) {
             musicService.clear()
-            musicService.add(data)
+            musicService.add(tracksData)
         } else {
             val removeTrackIndices = (0 until originalQueue.size).toMutableList()
             removeTrackIndices.removeAt(currentTrackIndex)
             musicService.remove(removeTrackIndices)
             
-            val splicedTracks = data.takeLast(data.size - (currentTrackNewIndex+1)).plus(data.take(currentTrackNewIndex))
+            val splicedTracks = tracksData.takeLast(tracksData.size - (currentTrackNewIndex+1)).plus(tracksData.take(currentTrackNewIndex))
             musicService.add(splicedTracks)
         }
 
@@ -642,7 +645,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         try {
             if (musicService.tracks.isEmpty())
                 setQueue(data, callback) 
-            else setQueueUninterruptedList(readableArrayToTrackList(data), callback)
+            else setQueueUninterruptedList(readableArrayToTrackList(data), null, callback)
         } catch (exception: Exception) {
             rejectWithException(callback, exception)
         }
