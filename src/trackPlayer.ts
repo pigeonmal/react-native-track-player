@@ -4,11 +4,11 @@ import {
   NativeEventEmitter,
   NativeModules,
   Platform,
-} from 'react-native';
+} from "react-native";
 // @ts-expect-error because resolveAssetSource is untyped
-import { default as resolveAssetSource } from 'react-native/Libraries/Image/resolveAssetSource';
+import { default as resolveAssetSource } from "react-native/Libraries/Image/resolveAssetSource";
 
-import { Event, RepeatMode, State } from './constants';
+import { Event, RepeatMode, State } from "./constants";
 import type {
   AddTrack,
   EventPayloadByEvent,
@@ -20,11 +20,11 @@ import type {
   Track,
   TrackMetadataBase,
   UpdateOptions,
-} from './interfaces';
+} from "./interfaces";
 
 const { TrackPlayerModule: TrackPlayer } = NativeModules;
 const emitter =
-  Platform.OS !== 'android'
+  Platform.OS !== "android"
     ? new NativeEventEmitter(TrackPlayer)
     : DeviceEventEmitter;
 
@@ -33,7 +33,7 @@ const emitter =
 function resolveImportedAssetOrPath(pathOrAsset: string | number | undefined) {
   return pathOrAsset === undefined
     ? undefined
-    : typeof pathOrAsset === 'string'
+    : typeof pathOrAsset === "string"
     ? pathOrAsset
     : resolveImportedAsset(pathOrAsset)?.uri;
 }
@@ -65,9 +65,9 @@ export async function setupPlayer(options: PlayerOptions = {}): Promise<void> {
  * Register the playback service. The service will run as long as the player runs.
  */
 export function registerPlaybackService(factory: () => ServiceHandler) {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     // Registers the headless task
-    AppRegistry.registerHeadlessTask('TrackPlayer', factory);
+    AppRegistry.registerHeadlessTask("TrackPlayer", factory);
   } else {
     // Initializes and runs the service in the next tick
     setImmediate(factory());
@@ -387,10 +387,10 @@ export async function setRepeatMode(mode: RepeatMode): Promise<RepeatMode> {
 }
 
 /**
- * Sets the random mode.
+ * @param shuffle Shuffle or unshuffle playlist
  */
-export async function setRandomMode(mode: Boolean): Promise<Boolean> {
-  return TrackPlayer.setRandomMode(mode);
+export async function shuffle(shuffle: Boolean): Promise<void> {
+  TrackPlayer.shuffle(shuffle);
 }
 
 // MARK: - Getters
@@ -510,14 +510,6 @@ export async function getPlaybackState(): Promise<PlaybackState> {
 export async function getRepeatMode(): Promise<RepeatMode> {
   return TrackPlayer.getRepeatMode();
 }
-
-/**
- * Gets the random mode.
- */
-export async function getRandomMode(): Promise<Boolean> {
-  return TrackPlayer.getRandomMode();
-}
-
 
 /**
  * Retries the current item when the playback state is `State.Error`.
