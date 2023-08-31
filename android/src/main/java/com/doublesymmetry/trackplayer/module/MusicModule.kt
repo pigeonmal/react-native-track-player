@@ -628,10 +628,16 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         } else {
             val removeTrackIndices = (0 until originalQueue.size).toMutableList()
             removeTrackIndices.removeAt(currentTrackIndex)
-            musicService.remove(removeTrackIndices)
+            if (!removeTrackIndices.isEmpty())
+                musicService.remove(removeTrackIndices)
                         
-            musicService.add(tracksData.takeLast(tracksData.size - (currentTrackNewIndex+1)))
-            musicService.add(tracksData.take(currentTrackNewIndex), 0)
+            val afterTracks = tracksData.takeLast(tracksData.size - (currentTrackNewIndex+1))
+            if (!afterTracks.isEmpty())
+                musicService.add(afterTracks)
+            
+            val beforeTracks = tracksData.take(currentTrackNewIndex)
+            if(!beforeTracks.isEmpty())
+                musicService.add(beforeTracks, 0)
         }
 
 
