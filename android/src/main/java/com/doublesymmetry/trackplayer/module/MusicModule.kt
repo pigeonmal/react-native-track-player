@@ -617,9 +617,10 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val currentTrackIndex:Int = musicService.getCurrentTrackIndex()
         val originalQueue:List<Track> = musicService.tracks
         
-        val currentTrackId: String = Arguments.fromBundle(originalQueue[currentTrackIndex].originalItem).getString("id")
+        val currentTrackId: String = Arguments.fromBundle(originalQueue[currentTrackIndex].originalItem)!!.getString("id")
         
-        val currentTrackNewIndex:Int = Arguments.fromList(tracksData.map { it.originalItem }).indexOfFirst { item -> item.getString("id") == currentTrackId }
+        val trackItems = tracksData.map { it.originalItem }
+        val currentTrackNewIndex: Int = trackItems.indexOfFirst { item -> item.getString("id") == currentTrackId }
 
         if (currentTrackNewIndex < 0) {
             musicService.clear()
