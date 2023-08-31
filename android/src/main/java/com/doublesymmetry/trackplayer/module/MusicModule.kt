@@ -556,9 +556,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         }
      
         // TRUE: [], FALSE: ACTUAL SEED
-        val randomSeed = musicService.randomSeed
+        val randomSeed:List<Int> = musicService.randomSeed
         // TRUE: randomSeed, FALSE: []
-        musicService.randomSeed = if (isShuffleActive) emptyList() else List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() }
+        musicService.randomSeed = if (mode) List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() } else emptyList()
 
         setQueueUninterruptedList(musicService.tracks, randomSeed, callback)
     }
@@ -628,9 +628,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
             val removeTrackIndices = (0 until originalQueue.size).toMutableList()
             removeTrackIndices.removeAt(currentTrackIndex)
             musicService.remove(removeTrackIndices)
-            
-            val splicedTracks = tracksData.takeLast(tracksData.size - (currentTrackNewIndex+1)).plus(tracksData.take(currentTrackNewIndex))
-            musicService.add(splicedTracks)
+                        
+            musicService.add(tracksData.takeLast(tracksData.size - (currentTrackNewIndex+1)))
+            musicService.add(tracksData.take(currentTrackNewIndex), 0)
         }
 
 
