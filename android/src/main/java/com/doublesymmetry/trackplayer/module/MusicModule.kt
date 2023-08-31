@@ -558,9 +558,9 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         // TRUE: [], FALSE: ACTUAL SEED
         val randomSeed = musicService.randomSeed
         // TRUE: randomSeed, FALSE: []
-        musicService.randomSeed = if (isShuffleActive) [] else List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() }
+        musicService.randomSeed = if (isShuffleActive) emptyList() else List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() }
 
-        setQueueUninterruptedList(shuffledQueue, randomSeed, callback)
+        setQueueUninterruptedList(musicService.tracks, randomSeed, callback)
     }
 
      @ReactMethod
@@ -614,11 +614,12 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         val isShuffleActive = musicService.isShuffle()
         val tracksData = if (isShuffleActive) shuffleList(data, musicService.randomSeed) else if(!randomSeed.isEmpty()) shuffleList(data, randomSeed, true) else data
 
-        val currentTrackIndex = musicService.getCurrentTrackIndex()
-        val originalQueue = musicService.tracks
-        val currentTrackId = Arguments.fromBundle(originalQueue[currentTrackIndex].originalItem).id
+        val currentTrackIndex:Int = musicService.getCurrentTrackIndex()
+        val originalQueue:List<Track> = musicService.tracks
         
-        val currentTrackNewIndex = Arguments.fromList(tracksData.map { it.originalItem }).indexOfFirst { item -> item.id == currentTrackId }
+        val currentTrackId: String = Arguments.fromBundle(originalQueue[currentTrackIndex].originalItem).getString("id")
+        
+        val currentTrackNewIndex:Int = Arguments.fromList(tracksData.map { it.originalItem }).indexOfFirst { item -> item.getString("id") == currentTrackId }
 
         if (currentTrackNewIndex < 0) {
             musicService.clear()
@@ -643,7 +644,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         try {
             if (musicService.tracks.isEmpty())
                 setQueue(data, callback) 
-            else setQueueUninterruptedList(readableArrayToTrackList(data), [], callback)
+            else setQueueUninterruptedList(readableArrayToTrackList(data), emptyList(), callback)
         } catch (exception: Exception) {
             rejectWithException(callback, exception)
         }
