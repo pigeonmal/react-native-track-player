@@ -425,7 +425,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
     @ReactMethod
     fun reset(callback: Promise) = scope.launch {
         if (verifyServiceBoundOrReject(callback)) return@launch
-
+        musicService.randomSeed = emptyList()
         musicService.stop()
         delay(300) // Allow playback to stop
         musicService.clear()
@@ -558,7 +558,8 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         // TRUE: [], FALSE: ACTUAL SEED
         val randomSeed:List<Int> = musicService.randomSeed
         // TRUE: randomSeed, FALSE: []
-        musicService.randomSeed = if (mode) List((musicService.tracks.size + 1) / 2) { Math.ceil(Math.random() * 10).toInt() } else emptyList()
+        val lensize = musicService.tracks.size
+        musicService.randomSeed = if (mode) List(lensize) { Math.ceil(Math.random() * (lensize + 10)).toInt() } else emptyList()
 
         setQueueUninterruptedList(musicService.tracks, randomSeed, callback)
     }
