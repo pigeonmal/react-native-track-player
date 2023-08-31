@@ -59,7 +59,7 @@ class MusicService : HeadlessJsTaskService() {
 
     private var appKilledPlaybackBehavior = AppKilledPlaybackBehavior.CONTINUE_PLAYBACK
 
-    var randomSeed: List<Int> = [];
+    var randomSeed: List<Int> = emptyList();
 
     val tracks: List<Track>
         get() = player.items.map { (it as TrackAudioItem).track }
