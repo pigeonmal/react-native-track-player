@@ -1,3 +1,38 @@
+# [4.0.1](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0...v4.0.1) (2023-10-31)
+
+* **android:** Fix: notification dissapearing in background
+* **android:** Allow overriding notification channel name and description
+
+# [4.0.0](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc09...v4.0.0) (2023-10-20)
+
+* **RN:** New metadata events have a new `metadata` property that contains the metadata that was received
+* **android:** Fix: allow updating duration in notification metadata
+* **ios:** Avoid prematurely activating audio session
+* **android:** Fix: don't emit both PlaybackTrackChanged when queue ends (parity with iOS)
+* **android:** Fix: allow progressUpdateEventInterval to be set to a decimal value (partial seconds)
+* **android:** Support for setting grace period before stopForeground (defaults to 5 seconds)
+* **ios:** Fix: updating rate will immediately reflect in control center
+* **android** Fix: issue where loading a new track after end required seek to start 
+* **ios:** Fix: crash adding output when load is called too fast
+
+# [4.0.0-rc09](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc08...v4.0.0-rc09) (2023-09-22)
+
+* **RN:** useIsPlaying hook now takes into account `none` state
+* **ios:** Fixes issue where rate was being reset to 1 on play
+* **ios:** Deactivates session before activating on play to avoid issues when losing focus in some scenarios
+* **RN:** Deprecated `Event.PlaybackMetadataReceived` and introduces three new events: [`Event.AudioChapterMetadataReceived`, `Event.AudioTimedMetadataReceived`, `Event.AudioCommonMetadataReceived`]
+* **ios:** Change default pitch algorithm to `timeDomain` instead of `lowQualityZeroLatency`
+* **android:** Fixes progress in notification for HLS audio
+
+# [4.0.0-rc08](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc07...v4.0.0-rc08) (2023-09-07)
+
+* **RN:** Undeprecate updateNowPlayingMetadata
+* **android:** Restore notification image caching
+* **RN:** Fix issue with updateOptions and local images
+* **ios:** Activate session on play to avoid issues with background audio
+* **ios:** Second fix for repeat mode
+* **ios:** Correctly update control center progress when pausing/playing
+
 # [4.0.0-rc07](https://github.com/doublesymmetry/react-native-track-player/compare/v4.0.0-rc06...v4.0.0-rc07) (2023-08-11)
 
 * **ios:** Fix firing of `EventType.PlaybackQueueEnded` (fixes #2038)

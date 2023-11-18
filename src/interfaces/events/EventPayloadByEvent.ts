@@ -4,6 +4,8 @@ import type { PlaybackState } from '../PlaybackState';
 import type { PlaybackActiveTrackChangedEvent } from './PlaybackActiveTrackChangedEvent';
 import type { PlaybackErrorEvent } from './PlaybackErrorEvent';
 import type { PlaybackMetadataReceivedEvent } from './PlaybackMetadataReceivedEvent';
+import type { AudioMetadataReceivedEvent } from './AudioMetadataReceivedEvent';
+import type { AudioCommonMetadataReceivedEvent } from './AudioMetadataReceivedEvent';
 import type { PlaybackPlayWhenReadyChangedEvent } from './PlaybackPlayWhenReadyChangedEvent';
 import type { PlaybackProgressUpdatedEvent } from './PlaybackProgressUpdatedEvent';
 import type { PlaybackQueueEndedEvent } from './PlaybackQueueEndedEvent';
@@ -18,7 +20,7 @@ import type { RemoteSeekEvent } from './RemoteSeekEvent';
 import type { RemoteSetRatingEvent } from './RemoteSetRatingEvent';
 import type { RemoteSkipEvent } from './RemoteSkipEvent';
 
-export interface EventPayloadByEvent {
+export type EventPayloadByEvent = {
   [Event.PlayerError]: PlayerErrorEvent;
   [Event.PlaybackState]: PlaybackState;
   [Event.PlaybackError]: PlaybackErrorEvent;
@@ -44,4 +46,16 @@ export interface EventPayloadByEvent {
   [Event.RemoteLike]: never;
   [Event.RemoteDislike]: never;
   [Event.RemoteBookmark]: never;
-}
+  [Event.MetadataChapterReceived]: AudioMetadataReceivedEvent;
+  [Event.MetadataTimedReceived]: AudioMetadataReceivedEvent;
+  [Event.MetadataCommonReceived]: AudioCommonMetadataReceivedEvent;
+};
+
+// eslint-disable-next-line
+type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
+
+export type EventPayloadByEventWithType = {
+  [K in keyof EventPayloadByEvent]: EventPayloadByEvent[K] extends never
+    ? { type: K }
+    : Simplify<EventPayloadByEvent[K] & { type: K }>;
+};
