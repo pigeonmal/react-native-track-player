@@ -290,6 +290,10 @@ export async function reset(): Promise<void> {
   return TrackPlayer.reset();
 }
 
+export async function clearPlayer(): Promise<void> {
+  return TrackPlayer.clearPlayer();
+}
+
 /**
  * Plays or resumes the current track.
  */
