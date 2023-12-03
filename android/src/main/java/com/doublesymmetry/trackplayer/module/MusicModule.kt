@@ -561,6 +561,7 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         musicService.randomSeed = if (mode) List(lensize) { Math.ceil(Math.random() * (lensize + 10)).toInt() } else emptyList()
 
         setQueueUninterruptedList(musicService.tracks, randomSeed, callback)
+        callback.resolve(null)
     }
 
      @ReactMethod
@@ -608,6 +609,13 @@ class MusicModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         } catch (exception: Exception) {
             rejectWithException(callback, exception)
         }
+    }
+      @ReactMethod
+    fun clearPlayer(callback: Promise) = scope.launch {
+        if (verifyServiceBoundOrReject(callback)) return@launch
+         musicService.randomSeed = emptyList()
+        musicService.clear()
+        callback.resolve(null)
     }
     
     fun setQueueUninterruptedList(data: List<Track>, randomSeed: List<Int>, callback: Promise) {
