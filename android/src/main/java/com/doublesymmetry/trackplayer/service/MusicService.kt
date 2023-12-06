@@ -294,22 +294,26 @@ class MusicService : HeadlessJsTaskService() {
     fun add(tracks: List<Track>) {
         val items = tracks.map { it.toAudioItem() }
         player.add(items)
+        emitQueueChangedEvent()
     }
 
     @MainThread
     fun add(tracks: List<Track>, atIndex: Int) {
         val items = tracks.map { it.toAudioItem() }
         player.add(items, atIndex)
+        emitQueueChangedEvent()
     }
 
     @MainThread
     fun load(track: Track) {
         player.load(track.toAudioItem())
+    emitQueueChangedEvent()
     }
 
     @MainThread
     fun move(fromIndex: Int, toIndex: Int) {
         player.move(fromIndex, toIndex);
+        emitQueueChangedEvent()
     }
 
     @MainThread
@@ -320,11 +324,13 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun remove(indexes: List<Int>) {
         player.remove(indexes)
+        emitQueueChangedEvent()
     }
 
     @MainThread
     fun clear() {
         player.clear()
+        emitQueueChangedEvent()
     }
 
     @MainThread
@@ -345,11 +351,13 @@ class MusicService : HeadlessJsTaskService() {
     @MainThread
     fun removeUpcomingTracks() {
         player.removeUpcomingItems()
+        emitQueueChangedEvent()
     }
 
     @MainThread
     fun removePreviousTracks() {
         player.removePreviousItems()
+        emitQueueChangedEvent()
     }
 
     @MainThread
@@ -481,6 +489,12 @@ class MusicService : HeadlessJsTaskService() {
         bundle.putInt(TRACK_KEY, player.currentIndex)
         bundle.putDouble(POSITION_KEY, player.position.toSeconds())
         emit(MusicEvents.PLAYBACK_QUEUE_ENDED, bundle)
+    }
+    private fun emitQueueChangedEvent() {
+    //    emitList(MusicEvents.PLAYBACK_QUEUE_CHANGED, ArrayList(musicService.tracks.map { it.originalItem }))
+        val bundle = Bundle()
+        bundle.putParcelableArrayList("queue", ArrayList(musicService.tracks.map { it.originalItem }))
+        emit(MusicEvents.PLAYBACK_QUEUE_CHANGED, bundle)
     }
 
     @Suppress("DEPRECATION")
