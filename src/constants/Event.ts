@@ -7,6 +7,7 @@ export enum Event {
   PlaybackError = 'playback-error',
   /** Fired after playback has paused due to the queue having reached the end. */
   PlaybackQueueEnded = 'playback-queue-ended',
+  PlaybackQueueChanged = 'playback-queue-changed',
   /**
    * Fired when another track has become active or when there no longer is an
    * active track.
