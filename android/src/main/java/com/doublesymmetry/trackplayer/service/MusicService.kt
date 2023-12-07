@@ -493,7 +493,7 @@ class MusicService : HeadlessJsTaskService() {
     private fun emitQueueChangedEvent() {
     //    emitList(MusicEvents.PLAYBACK_QUEUE_CHANGED, ArrayList(musicService.tracks.map { it.originalItem }))
         val bundle = Bundle()
-        bundle.putParcelableArrayList("queue", ArrayList(musicService.tracks.map { it.originalItem }))
+        bundle.putParcelableArrayList("queue", ArrayList(tracks.map { it.originalItem }))
         emit(MusicEvents.PLAYBACK_QUEUE_CHANGED, bundle)
     }
 
